@@ -17,11 +17,28 @@ def parse(input_str):
     if "@" in modifiers:
         modifiers, snap_instruction = modifiers.split("@")
 
-    # Error Handling, if the entered date doesn't have any digit/value
-    if modifiers:
-        if not any(char.isdigit() for char in modifiers):
-            raise ValueError(
-                "The entered date does not have any digits, Please enter the digits")
+    # Check for invalid characters
+    invalid_characters = set(modifiers) - set("0123456789+-dhymon")
+    if invalid_characters:
+        raise ValueError(
+            f"Invalid character(s) detected in modifiers: {invalid_characters}")
+
+    # Check for invalid cases where there are no number digits in front of identifiers
+    if re.search(r'[\+\-]y', modifiers) and not re.search(r'\d+y', modifiers):
+        raise ValueError(
+            "Invalid modifier: Year should have a number digit in front of year-y")
+    if re.search(r'[\+\-]d', modifiers) and not re.search(r'\d+d', modifiers):
+        raise ValueError(
+            "Invalid modifier: Day should have a number digit in front of day-d")
+    if re.search(r'[\+\-]m', modifiers) and not re.search(r'\d+m', modifiers):
+        raise ValueError(
+            "Invalid modifier: Minute should have a number digit in front of minuite-m")
+    if re.search(r'[\+\-]h', modifiers) and not re.search(r'\d+h', modifiers):
+        raise ValueError(
+            "Invalid modifier: Hour should have a number digit in front of hour-h")
+    if re.search(r'[\+\-]mon', modifiers) and not re.search(r'\d+mon', modifiers):
+        raise ValueError(
+            "Invalid modifier: Month should have a number digit in front of month-mon")
 
     pattern = r'(?P<part>[+-]\d+\w+)'
 
