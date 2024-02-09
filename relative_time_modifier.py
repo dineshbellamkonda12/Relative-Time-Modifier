@@ -17,6 +17,12 @@ def parse(input_str):
     if "@" in modifiers:
         modifiers, snap_instruction = modifiers.split("@")
 
+    # Error Handling, if the entered date doesn't have any digit/value
+    if modifiers:
+        if not any(char.isdigit() for char in modifiers):
+            raise ValueError(
+                "The entered date does not have any digits, Please enter the digits")
+
     pattern = r'(?P<part>[+-]\d+\w+)'
 
     modifier_list = re.findall(pattern, modifiers)
@@ -37,8 +43,6 @@ def parse(input_str):
         else:
             operator = "-"
 
-        if not any(char.isdigit() for char in modifier):
-            raise ValueError("Invalid modifier format: Missing value")
         value = int("".join(char for char in modifier if char.isdigit()))
         time_units = "".join(char for char in modifier if char.isalpha())
         if time_units == "d":
