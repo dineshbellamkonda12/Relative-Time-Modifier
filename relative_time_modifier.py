@@ -12,18 +12,27 @@ def parse(input_str):
     # Get current UTC date and time
     base_date = datetime.utcnow()
 
-    # Handle snapping instructions
-    snap_instruction = None
-    if "@" in modifiers:
-        modifiers, snap_instruction = modifiers.split("@")
+    snap_instructions = {
+        "d": dict(hour=0, minute=0, second=0, microsecond=0),
+        "h": dict(minute=0, second=0, microsecond=0),
+        "m": dict(second=0, microsecond=0),
+        "s": dict(microsecond=0),
+        "mon": dict(day=1, hour=0, minute=0, second=0, microsecond=0),
+        "y": dict(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+    }
 
-    # Check for invalid characters
-    invalid_characters = set(modifiers) - set("0123456789+-dhymon")
+    # Check for invalid characters(Error Handling)
+    invalid_characters = set(modifiers) - set("0123456789+@-dhymon")
     if invalid_characters:
         raise ValueError(
             f"Invalid character(s) detected in modifiers: {invalid_characters}")
 
-    # Check for invalid cases where there are no number digits in front of identifiers
+    # Check for multiple invalid operators(Error Handling)
+    if '-+' in modifiers or '+-' in modifiers:
+        raise ValueError(
+            "+- or -+ should not be entered in front of identifier")
+
+    # Check for invalid cases where there are no number digits in front of identifiers(Error Handling)
     if re.search(r'[\+\-]y', modifiers) and not re.search(r'\d+y', modifiers):
         raise ValueError(
             "Invalid modifier: Year should have a number digit in front of year-y")
@@ -81,34 +90,17 @@ def parse(input_str):
     ) + relativedelta(months=offset_months, years=offset_years)
 
     # Handle snapping instructions(@d, @mon, @y, @m, @s)
-    if snap_instruction:
-        if snap_instruction == "d":
-            base_date = base_date.replace(
-                hour=0, minute=0, second=0, microsecond=0
-            )
-        elif snap_instruction == "h":
-            base_date = base_date.replace(
-                minute=0, second=0, microsecond=0)
-        elif snap_instruction == "m":
-            base_date = base_date.replace(second=0, microsecond=0)
-        elif snap_instruction == "s":
-            base_date = base_date.replace(microsecond=0)
-        elif snap_instruction == "mon":
-            base_date = base_date.replace(
-                day=1, hour=0, minute=0, second=0, microsecond=0
-            )
-        elif snap_instruction == "y":
-            base_date = base_date.replace(
-                month=1, day=1, hour=0, minute=0, second=0, microsecond=0
-            )
-        else:
+    if "@" in modifiers:
+        _, snap_instruction = modifiers.split("@")
+        if snap_instruction not in snap_instructions:
             raise ValueError(f"Invalid snap unit: {snap_instruction}")
+        base_date = base_date.replace(**snap_instructions[snap_instruction])
 
     return base_date
 
 
 # Test cases
-print(parse("now()"))
+print(parse("now()+1d+2mon-1y"))
 
 date_strings = [
     # Addition
