@@ -33,21 +33,12 @@ def parse(input_str):
             "+- or -+ should not be entered in front of identifier")
 
     # Check for invalid cases where there are no number digits in front of identifiers(Error Handling)
-    if re.search(r'[\+\-]y', modifiers) and not re.search(r'\d+y', modifiers):
-        raise ValueError(
-            "Invalid modifier: Year should have a number digit in front of year-y")
-    if re.search(r'[\+\-]d', modifiers) and not re.search(r'\d+d', modifiers):
-        raise ValueError(
-            "Invalid modifier: Day should have a number digit in front of day-d")
-    if re.search(r'[\+\-]m', modifiers) and not re.search(r'\d+m', modifiers):
-        raise ValueError(
-            "Invalid modifier: Minute should have a number digit in front of minuite-m")
-    if re.search(r'[\+\-]h', modifiers) and not re.search(r'\d+h', modifiers):
-        raise ValueError(
-            "Invalid modifier: Hour should have a number digit in front of hour-h")
-    if re.search(r'[\+\-]mon', modifiers) and not re.search(r'\d+mon', modifiers):
-        raise ValueError(
-            "Invalid modifier: Month should have a number digit in front of month-mon")
+    time_units = {'y': 'year', 'mon': 'month', 'd': 'day',
+                  'm': 'minute', 'h': 'hour'}
+    for unit in time_units:
+        if re.search(fr'[\+\-]{unit}', modifiers) and not re.search(fr'\d+{unit}', modifiers):
+            raise ValueError(
+                f"Invalid modifier: {time_units[unit]} should have a number digit in front of {unit}")
 
     pattern = r'(?P<part>[+-]\d+\w+)'
 
@@ -100,7 +91,7 @@ def parse(input_str):
 
 
 # Test cases
-print(parse("now()+1d+2mon-1y"))
+print(parse("now()"))
 
 date_strings = [
     # Addition
