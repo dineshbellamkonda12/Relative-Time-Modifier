@@ -25,7 +25,7 @@ def parse(input_str):
     invalid_characters = set(modifiers) - set("0123456789+@-dhymon")
     if invalid_characters:
         raise ValueError(
-            f"Invalid character(s) detected in modifiers: {invalid_characters}")
+            f"Invalid character detected in modifiers: {invalid_characters}")
 
     # Check for multiple invalid operators(Error Handling)
     if '-+' in modifiers or '+-' in modifiers:
